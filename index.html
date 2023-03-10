@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Menu Creator</title>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <h1>Menu Creator</h1>
+    <label for="title">Enter a title for your menu:</label><br>
+    <input type="text" id="title" name="title"><br><br>
+    <div id="menu-options">
+      <label for="option">Menu option:</label>
+      <input type="text" id="option" name="option">
+      <label for="command">Command:</label>
+      <input type="text" id="command" name="command">
+      <button onclick="addOption()">Add menu option</button>
+    </div><br>
+    <button onclick="generateScript()">Generate Script</button>
+    <button onclick="resetOptions()">Reset options</button><br><br>
+    <form id="menu-form">
+      <textarea id="script" rows="20" cols="80"></textarea>
+    </form>
+
+    <script>
+      var optionCount = 0;
+      var options = [];
+
+      function addOption() {
+        optionCount++;
+        var optionName = document.getElementById("option").value;
+        var command = document.getElementById("command").value;
+        options.push({ name: optionName, command: command });
+        var optionDiv = document.createElement("div");
+        optionDiv.setAttribute("id", "optionDiv" + optionCount);
+        optionDiv.innerHTML = '<label for="option' + optionCount + '">Menu option:</label>' +
+                              '<input type="text" id="option' + optionCount + '" name="option' + optionCount + '">' +
+                              '<label for="command' + optionCount + '">Command:</label>' +
+                              '<input type="text" id="command' + optionCount + '" name="command' + optionCount + '">' +
+                              '<button id="deleteOption' + optionCount + '" onclick="deleteOption(' + optionCount + ')">Delete</button>';
+        document.getElementById("menu-options").appendChild(optionDiv);
+      }
+
+      function deleteOption(optionIndex) {
+        options.splice(optionIndex - 1, 1);
+        document.getElementById("optionDiv" + optionIndex).remove();
+        generateScript(); // regenerate the script
+      }
+      
+      function generateScript() {
+        // Retrieve the default option and command inputs
+        var defaultOption = document.getElementById("option").value;
+        var defaultCommand = document.getElementById("command").value;
+        var script = "#!/usr/bin/env python\n\n";
+        script += "###===Import Modules Go Here===###\n";
+        script += "import os\n\n";
+        script += "###===Setting your variables to blank values===###\n";
+        script += "#{Variable needs to be setup}\n";
+        script += "###===Separator Function For Pretty Menu===###\n";
+        script += "def print_separator():\n";
+        script += "    print(\"=\" * 50)\n";
+        script += "###===Your Viewable Menu===###\n";
+        script += "def menu():\n";
+        script += "    clear_screen()\n";
+        var title = document.getElementById("title").value;
+        if (title) {
+          script += "    print('" + title + "')\n";
+        }     
+        script += "    print_separator()\n";
+        // Include the default option and command in the script
+        script += "    print('" + defaultOption + "')\n";
+        // Loop through the dynamically added menu options and include them in the script
+        for (var i = 1; i <= optionCount; i++) {
+          var optionName = document.getElementById("option" + i).value;
+          var command = document.getElementById("command" + i).value;
+          script += "    print('" + optionName + "')\n";
+        }
+        script += "    print('(exit) Exit')\n\n";
+        script += "###===Making Clear Screen Work On Windows And Linux===###\n";
+        script += "def clear_screen():\n";
+        script += "    os.system('cls' if os.name == 'nt' else 'clear')\n\n";
+        script += "###===When You Choose An Option It Runs One Of These===###\n";
+        script += "def defaultOption():\n";
+        script += "    print('" + defaultOption + "')\n";
+        script += "    os.system(" + defaultCommand + ")\n\n";
+        for (var i = 1; i <= optionCount; i++) {
+          var optionName = document.getElementById("option" + i).value;
+          var command = document.getElementById("command" + i).value;
+          script += "def optionName():\n";
+          script += "    print('" + optionName + "')\n";
+          script += "    os.system(" + command + ")\n";
+          script += "\n"
+        }
+        script += "def exit_menu():\n";
+        script += "    print('Goodbye!')\n";
+        script += "    exit()\n\n";
+        script += "###===Enter Your Choice And Then It Will Activate That Option===###\n";
+        script += "if __name__ == '__main__':\n";
+        script += "    while True:\n";
+        script += "        menu()\n";
+        script += "        choice = input('Enter your choice: ')\n";
+        script += "        if choice == '1':\n";
+        script += "            exit_menu()\n";
+        script += "        elif choice.lower() == 'exit':\n";
+        script += "            exit_menu()\n";
+        script += "        else:\n";
+        script += "            print('Invalid choice. Try again.')\n";
+
+        document.getElementById("script").value = script;
+      }
+
+      function resetOptions() {
+        // Remove all dynamically added menu option fields
+        for (var i = 1; i <= optionCount; i++) {
+          document.getElementById("optionDiv" + i).remove();
+        }
+      
+        // Reset the option count and options array
+        optionCount = 0;
+        options = [];
+      
+        // Recreate the original menu option fields
+        document.getElementById("menu-options").innerHTML = '<label for="option">Menu option:</label>' +
+                                                              '<input type="text" id="option" name="option">' +
+                                                              '<label for="command">Command:</label>' +
+                                                              '<input type="text" id="command" name="command">' +
+                                                              '<button onclick="addOption()">Add menu option</button><br><br>';
+      }    
+      </script>
+  </body>
+</html
