@@ -14,8 +14,8 @@ Example.py is included in this repository for understanding how the script shoul
 The options used to generate example.py are as follows:
 
 
-Title: Scanner Script!
-2 menu options
+## Title: Scanner Script!
+## 2 menu options
 1. nmap -sV -sC $target
 2. ping $target2
 
