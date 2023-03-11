@@ -6,7 +6,7 @@
   </head>
   <body>
     <h1>Menu Creator</h1>
-    <label for="title">Enter a title for your menu:</label><br>
+    <label for="title">Enter a title for your menu: (must have at least 2 menu options)</label><br>
     <input type="text" id="title" name="title"><br><br>
     <div id="menu-options">
       <label for="option">Menu option:</label>
@@ -70,6 +70,8 @@
         var allMatches = defaultMatches.concat(inputMatches).map(function(match) {
           return match.replace('$', '');
         });
+        
+        var uniqueMatches = [...new Set(allMatches)];
         var script = "#!/usr/bin/env python\n\n";
         script += "###===Import Modules Go Here===###\n";
         script += "import os\n\n";
@@ -87,8 +89,8 @@
         if (title) {
           script += "    print('" + title + "')\n";
         } 
-        if (allMatches.join("")) { // Check if allMatches.join has a value
-          script += "    print('" + "" + allMatches.join(", ") + "')\n";
+        if (uniqueMatches.join("")) { // Check if allMatches.join has a value
+          script += "    print('" + "Your script requires these variables to bet set" + " " + uniqueMatches.join(", ") + "')\n";
         }
         script += "    print_separator()\n";
         // Include the default option and command in the script
@@ -99,14 +101,21 @@
           var command = document.getElementById("command" + i).value;
           script += "    print('" + (i+1) + ". " + optionName + "')\n";
         }
-        script += "    print('(exit) Exit')\n\n";
+        if (uniqueMatches.join("")) { // Check if allMatches.join has a value
+          script += "    ";
+          for (var j = 0; j < uniqueMatches.length; j++) {
+            script += "print(f'set_" + uniqueMatches[j] + " | Variable currently set as {" + uniqueMatches[j] +"}')\n    ";
+          }
+        }
+        script += "print('(exit) Exit')\n\n";
         script += "###===Making Clear Screen Work On Windows And Linux===###\n";
         script += "def clear_screen():\n";
         script += "    os.system('cls' if os.name == 'nt' else 'clear')\n\n";
         script += "###===When You Choose An Option It Runs One Of These===###\n";
         script += "def " + defaultOption_formatted + "():\n";
         script += "    print('You selected " + defaultOption + "')\n";
-        script += "    " + defaultOption_formatted + " = f\"" + defaultCommand + "\"\n";
+        var replaceddInput = defaultCommand.replace(/\$([a-zA-Z0-9]+)/g, '{$1}');
+        script += "    " + defaultOption_formatted + " = f\"" + replaceddInput + "\"\n";
         script += "    try:\n";
         script += "        os.system(" + defaultOption_formatted + ")\n";
         script += "    except KeyboardInterrupt:\n";
@@ -117,23 +126,24 @@
             var commandInput = document.getElementById("command" + i).value;
             var command = commandInput.value;
             var optionName_formatted = optionName.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "_");
+            var replacedInput = commandInput.replace(/\$([a-zA-Z0-9]+)/g, '{$1}');
             script += "def " + optionName_formatted + "():\n";
             script += "    print('You selected " + optionName + "')\n";
-            script += "    " + optionName_formatted + " = f\"" + commandInput + "\"\n";
+            script += "    " + optionName_formatted + " = f\"" + replacedInput + "\"\n";
             script += "    try:\n";
             script += "        os.system(" + optionName_formatted + ")\n";
             script += "    except KeyboardInterrupt:\n";
             script += "        print('" + optionName + " interrupted by user')\n";
             script += "    input('Press enter to return to menu...')\n\n";
         }
-        if (allMatches.length > 0) {
-          allMatches.forEach((match, index) => {
+        if (uniqueMatches.length > 0) {
+          uniqueMatches.forEach((match, index) => {
             script += `def set_${match}():
             global ${match}
             ${match} = input('Enter a new ${match}:')
             input('Press enter to return to menu...')
         `;
-            if (index !== allMatches.length - 1) {
+            if (index !== uniqueMatches.length - 1) {
               script += '\n';
             }
           });
@@ -169,13 +179,12 @@
           script += "        if choice == '" + (i+1) + "':\n";
           script += "            " + optionNameFormatted + "()\n";
         }        
-        if (allMatches.length > 0) {
-          allMatches.forEach((match, index) => {
-            script += `        if choice == 'set_${match}':
-                    set_${match}()\n`;
-            if (index !== allMatches.length - 1) {
-              script += `        `;
-            }
+        // Generate the `if` statements for each option
+        if (uniqueMatches.length > 0) {
+          uniqueMatches.forEach((match, index) => {
+            const matchFormatted = match.replace(/[^a-zA-Z0-9]/g, ""); // remove non-alphanumeric characters from match
+            script += `        if choice == 'set_${matchFormatted}':\n`;
+            script += `            set_${match}()\n`;
           });
         }
         script += "        elif choice.lower() == 'exit':\n";
@@ -206,4 +215,4 @@
       }    
       </script>
   </body>
-</html
+</html>
