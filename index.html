@@ -16,7 +16,8 @@
       <button onclick="addOption()">Add menu option</button>
     </div><br>
     <button onclick="generateScript()">Generate Script</button>
-    <button onclick="resetOptions()">Reset options</button><br><br>
+    <button onclick="resetOptions()">Reset options</button>
+    <button onclick="copyScript()">Copy Script</button><br><br>
     <form id="menu-form">
       <textarea id="script" rows="20" cols="80"></textarea>
     </form>
@@ -24,6 +25,12 @@
     <script>
       var optionCount = 0;
       var options = [];
+
+      function copyScript() {
+        var copyText = document.getElementById("script");
+        copyText.select();
+        document.execCommand("copy");
+      }
 
       function addOption() {
         optionCount++;
@@ -54,10 +61,10 @@
         script += "###===Import Modules Go Here===###\n";
         script += "import os\n\n";
         script += "###===Setting your variables to blank values===###\n";
-        script += "#{Variable needs to be setup}\n";
+        script += "#{Variable needs to be setup}\n\n";
         script += "###===Separator Function For Pretty Menu===###\n";
         script += "def print_separator():\n";
-        script += "    print(\"=\" * 50)\n";
+        script += "    print(\"=\" * 50)\n\n";
         script += "###===Your Viewable Menu===###\n";
         script += "def menu():\n";
         script += "    clear_screen()\n";
@@ -67,28 +74,38 @@
         }     
         script += "    print_separator()\n";
         // Include the default option and command in the script
-        script += "    print('" + defaultOption + "')\n";
+        script += "    print('" + "1. " + defaultOption + "')\n";
         // Loop through the dynamically added menu options and include them in the script
         for (var i = 1; i <= optionCount; i++) {
           var optionName = document.getElementById("option" + i).value;
           var command = document.getElementById("command" + i).value;
-          script += "    print('" + optionName + "')\n";
+          script += "    print('" + (i+1) + ". " + optionName + "')\n";
         }
         script += "    print('(exit) Exit')\n\n";
         script += "###===Making Clear Screen Work On Windows And Linux===###\n";
         script += "def clear_screen():\n";
         script += "    os.system('cls' if os.name == 'nt' else 'clear')\n\n";
         script += "###===When You Choose An Option It Runs One Of These===###\n";
-        script += "def defaultOption():\n";
-        script += "    print('" + defaultOption + "')\n";
-        script += "    os.system(" + defaultCommand + ")\n\n";
+        script += "def " + defaultOption + "():\n";
+        script += "    print('You selected " + defaultOption + "')\n";
+        script += "    " + defaultOption + " = f\"" + defaultCommand + "\"\n";
+        script += "    try:\n";
+        script += "        os.system(" + defaultOption + ")\n";
+        script += "    except KeyboardInterrupt:\n";
+        script += "        print('" + defaultOption + " interrupted by user')\n";
+        script += "    input('Press enter to return to menu...')\n\n";
         for (var i = 1; i <= optionCount; i++) {
-          var optionName = document.getElementById("option" + i).value;
-          var command = document.getElementById("command" + i).value;
-          script += "def optionName():\n";
-          script += "    print('" + optionName + "')\n";
-          script += "    os.system(" + command + ")\n";
-          script += "\n"
+            var optionName = document.getElementById("option" + i).value;
+            var commandInput = document.getElementById("command" + i).value;
+            var command = commandInput.value;
+            script += "def " + optionName + "():\n";
+            script += "    print('You selected " + optionName + "')\n";
+            script += "    " + optionName + " = f\"" + commandInput + "\"\n";
+            script += "    try:\n";
+            script += "        os.system(" + optionName + ")\n";
+            script += "    except KeyboardInterrupt:\n";
+            script += "        print('" + optionName + " interrupted by user')\n";
+            script += "    input('Press enter to return to menu...')\n\n";
         }
         script += "def exit_menu():\n";
         script += "    print('Goodbye!')\n";
@@ -98,16 +115,28 @@
         script += "    while True:\n";
         script += "        menu()\n";
         script += "        choice = input('Enter your choice: ')\n";
-        script += "        if choice == '1':\n";
-        script += "            exit_menu()\n";
-        script += "        elif choice.lower() == 'exit':\n";
+        // Generate the `if` statements for each option
+        for (var i = 0; i <= optionCount; i++) {
+          var optionName, command;
+          if (i == 0) {
+            optionName = defaultOption;
+            command = defaultCommand;
+          } else {
+            optionName = document.getElementById("option" + i).value;
+            command = document.getElementById("command" + i).value;
+          }
+          script += "        if choice == '" + (i+1) + "':\n";
+          script += "            " + optionName + "()\n";
+        }        script += "        elif choice.lower() == 'exit':\n";
         script += "            exit_menu()\n";
         script += "        else:\n";
         script += "            print('Invalid choice. Try again.')\n";
-
+        for (var i = 1; i <= optionCount; i++) {
+          var optionName = document.getElementById("option" + i).value;
+          options.push(optionName);
+        }
         document.getElementById("script").value = script;
-      }
-
+              }
       function resetOptions() {
         // Remove all dynamically added menu option fields
         for (var i = 1; i <= optionCount; i++) {
