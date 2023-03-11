@@ -57,11 +57,24 @@
         // Retrieve the default option and command inputs
         var defaultOption = document.getElementById("option").value;
         var defaultCommand = document.getElementById("command").value;
+        var defaultOption_formatted = defaultOption.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "_");
+        var regex = /\$[a-zA-Z0-9]+/g;
+        var defaultMatches = defaultCommand.match(regex) || [];
+        for (var i = 1; i <= optionCount; i++) {
+            var optionName = document.getElementById("option" + i).value;
+            var commandInput = document.getElementById("command" + i).value;
+            var command = commandInput.value;
+            var optionName_formatted = optionName.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "_");
+            var inputMatches = commandInput.match(regex) || [];
+        }
+        var allMatches = defaultMatches.concat(inputMatches);        
         var script = "#!/usr/bin/env python\n\n";
         script += "###===Import Modules Go Here===###\n";
         script += "import os\n\n";
         script += "###===Setting your variables to blank values===###\n";
-        script += "#{Variable needs to be setup}\n\n";
+        if (allMatches.join("")) { // Check if allMatches.join has a value
+          script += allMatches.join(" = \"\"\n") + " = \"\"\n";
+        }
         script += "###===Separator Function For Pretty Menu===###\n";
         script += "def print_separator():\n";
         script += "    print(\"=\" * 50)\n\n";
@@ -71,7 +84,10 @@
         var title = document.getElementById("title").value;
         if (title) {
           script += "    print('" + title + "')\n";
-        }     
+        } 
+        if (allMatches.join("")) { // Check if allMatches.join has a value
+          script += "    print('" + "" + allMatches.join(", ") + "')\n";
+        }
         script += "    print_separator()\n";
         // Include the default option and command in the script
         script += "    print('" + "1. " + defaultOption + "')\n";
@@ -86,11 +102,11 @@
         script += "def clear_screen():\n";
         script += "    os.system('cls' if os.name == 'nt' else 'clear')\n\n";
         script += "###===When You Choose An Option It Runs One Of These===###\n";
-        script += "def " + defaultOption + "():\n";
+        script += "def " + defaultOption_formatted + "():\n";
         script += "    print('You selected " + defaultOption + "')\n";
-        script += "    " + defaultOption + " = f\"" + defaultCommand + "\"\n";
+        script += "    " + defaultOption_formatted + " = f\"" + defaultCommand + "\"\n";
         script += "    try:\n";
-        script += "        os.system(" + defaultOption + ")\n";
+        script += "        os.system(" + defaultOption_formatted + ")\n";
         script += "    except KeyboardInterrupt:\n";
         script += "        print('" + defaultOption + " interrupted by user')\n";
         script += "    input('Press enter to return to menu...')\n\n";
@@ -98,11 +114,12 @@
             var optionName = document.getElementById("option" + i).value;
             var commandInput = document.getElementById("command" + i).value;
             var command = commandInput.value;
-            script += "def " + optionName + "():\n";
+            var optionName_formatted = optionName.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "_");
+            script += "def " + optionName_formatted + "():\n";
             script += "    print('You selected " + optionName + "')\n";
-            script += "    " + optionName + " = f\"" + commandInput + "\"\n";
+            script += "    " + optionName_formatted + " = f\"" + commandInput + "\"\n";
             script += "    try:\n";
-            script += "        os.system(" + optionName + ")\n";
+            script += "        os.system(" + optionName_formatted + ")\n";
             script += "    except KeyboardInterrupt:\n";
             script += "        print('" + optionName + " interrupted by user')\n";
             script += "    input('Press enter to return to menu...')\n\n";
@@ -115,19 +132,29 @@
         script += "    while True:\n";
         script += "        menu()\n";
         script += "        choice = input('Enter your choice: ')\n";
+        // Create an array to hold all of the formatted option names
+        var optionNamesFormatted = [];
+        
         // Generate the `if` statements for each option
         for (var i = 0; i <= optionCount; i++) {
           var optionName, command;
           if (i == 0) {
-            optionName = defaultOption;
+            optionName = defaultOption_formatted;
             command = defaultCommand;
           } else {
             optionName = document.getElementById("option" + i).value;
             command = document.getElementById("command" + i).value;
           }
+          var optionNameFormatted = optionName.replace(/[^a-zA-Z0-9 ]/g, "").replace(/ /g, "_");
+          var defaultOptionFormatted = defaultOption.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "_");
+          if (i == 0) {
+            optionNameFormatted = defaultOptionFormatted;
+          }
+          optionNamesFormatted.push(optionNameFormatted);
           script += "        if choice == '" + (i+1) + "':\n";
-          script += "            " + optionName + "()\n";
-        }        script += "        elif choice.lower() == 'exit':\n";
+          script += "            " + optionNameFormatted + "()\n";
+        }        
+        script += "        elif choice.lower() == 'exit':\n";
         script += "            exit_menu()\n";
         script += "        else:\n";
         script += "            print('Invalid choice. Try again.')\n";
@@ -135,8 +162,7 @@
           var optionName = document.getElementById("option" + i).value;
           options.push(optionName);
         }
-        document.getElementById("script").value = script;
-              }
+        document.getElementById("script").value = script;              }
       function resetOptions() {
         // Remove all dynamically added menu option fields
         for (var i = 1; i <= optionCount; i++) {
