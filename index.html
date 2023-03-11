@@ -3,6 +3,148 @@
   <head>
     <title>Menu Creator</title>
     <meta charset="UTF-8">
+    <style>
+/* General Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 16px;
+  color: #333;
+  line-height: 1.5;
+  background-color: #f4f4f4;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header Styles */
+header {
+  background-color: #333;
+  color: #fff;
+  padding: 20px 0;
+}
+
+header h1 {
+  font-size: 2.5rem;
+  margin: 0;
+  text-align: center;
+}
+
+/* Form Styles */
+form {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+form label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+form input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-bottom: 20px;
+}
+
+form button {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color: #555;
+}
+
+.form-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.form-group input {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.form-group button {
+  background-color: #cc0000;
+  color: #fff;
+  padding: 5px 10px;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+}
+
+.form-group button:hover {
+  background-color: #ff0000;
+}
+
+/* Menu Options Styles */
+.menu-options {
+  margin-bottom: 20px;
+}
+
+.menu-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.menu-option label {
+  margin-right: 10px;
+}
+
+.menu-option input {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.menu-option button {
+  background-color: #cc0000;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.menu-option button:hover {
+  background-color: #ff0000;
+}
+
+/* Script Styles */
+#script {
+  width: 100%;
+  height: 400px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-bottom: 20px;
+  font-family: 'Courier New', Courier, monospace;
+}
+    </style>
   </head>
   <body>
     <h1>Menu Creator</h1>
@@ -13,8 +155,8 @@
       <input type="text" id="option" name="option">
       <label for="command">Command:</label>
       <input type="text" id="command" name="command">
-      <button onclick="addOption()">Add menu option</button>
     </div><br>
+    <button onclick="addOption()">Add menu option</button>
     <button onclick="generateScript()">Generate Script</button>
     <button onclick="resetOptions()">Reset options</button>
     <button onclick="copyScript()">Copy Script</button><br><br>
@@ -54,45 +196,58 @@
       }
       
       function generateScript() {
-        // Retrieve the default option and command inputs
-        var defaultOption = document.getElementById("option").value;
-        var defaultCommand = document.getElementById("command").value;
-        var defaultOption_formatted = defaultOption.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "_");
-        var regex = /\$[a-zA-Z0-9]+/g;
-        var defaultMatches = defaultCommand.match(regex) || [];
-        for (var i = 1; i <= optionCount; i++) {
-            var optionName = document.getElementById("option" + i).value;
-            var commandInput = document.getElementById("command" + i).value;
-            var command = commandInput.value;
-            var optionName_formatted = optionName.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "_");
-            var inputMatches = commandInput.match(regex) || [];
-        }
-        var allMatches = defaultMatches.concat(inputMatches).map(function(match) {
-          return match.replace('$', '');
-        });
-        
-        var uniqueMatches = [...new Set(allMatches)];
-        var script = "#!/usr/bin/env python\n\n";
-        script += "###===Import Modules Go Here===###\n";
-        script += "import os\n\n";
-        script += "###===Setting your variables to blank values===###\n";
-        if (allMatches.join("")) { // Check if allMatches.join has a value
-          script += allMatches.join(" = \"\"\n") + " = \"\"\n";
-        }
-        script += "###===Separator Function For Pretty Menu===###\n";
-        script += "def print_separator():\n";
-        script += "    print(\"=\" * 50)\n\n";
-        script += "###===Your Viewable Menu===###\n";
-        script += "def menu():\n";
-        script += "    clear_screen()\n";
-        var title = document.getElementById("title").value;
-        if (title) {
-          script += "    print('" + title + "')\n";
-        } 
-        if (uniqueMatches.join("")) { // Check if allMatches.join has a value
-          script += "    print('" + "Your script requires these variables to bet set" + " " + uniqueMatches.join(", ") + "')\n";
-        }
-        script += "    print_separator()\n";
+          var title = document.getElementById("title").value.trim();
+          if (!title) {
+              alert("Please enter a title for your menu.");
+              return;
+          }
+          // Retrieve the default option and command inputs
+          var defaultOption = document.getElementById("option").value;
+          var defaultCommand = document.getElementById("command").value;
+          var defaultOption_formatted = defaultOption.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "_");
+          var regex = /\$[a-zA-Z0-9]+/g;
+          var defaultMatches = defaultCommand.match(regex) || [];
+          var inputMatches = [];
+          var allMatches = [];
+          for (var i = 1; i <= optionCount; i++) {
+              var optionName = document.getElementById("option" + i).value;
+              var commandInput = document.getElementById("command" + i).value;
+              var command = commandInput;
+              var optionName_formatted = optionName.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "_");
+              inputMatches = inputMatches.concat(commandInput.match(regex) || []);
+              script += "def " + optionName_formatted + "():\n";
+              script += "    print('You selected " + optionName + "')\n";
+              var replacedInput = commandInput.replace(/\$([a-zA-Z0-9]+)/g, '{$1}');
+              script += "    " + optionName_formatted + " = f\"" + replacedInput + "\"\n";
+              script += "    try:\n";
+              script += "        os.system(" + optionName_formatted + ")\n";
+              script += "    except KeyboardInterrupt:\n";
+              script += "        print('" + optionName + " interrupted by user')\n";
+              script += "    input('Press enter to return to menu...')\n\n";
+          }
+          allMatches = defaultMatches.concat(inputMatches).map(function(match) {
+              return match.replace('$', '');
+          });
+          var uniqueMatches = [...new Set(allMatches)];
+          var script = "#!/usr/bin/env python\n\n";
+          script += "###===Import Modules Go Here===###\n";
+          script += "import os\n\n";
+          script += "###===Setting your variables to blank values===###\n";
+          if (allMatches.join("")) { // Check if allMatches.join has a value
+              script += allMatches.join(" = \"\"\n") + " = \"\"\n";
+          }
+          script += "###===Separator Function For Pretty Menu===###\n";
+          script += "def print_separator():\n";
+          script += "    print(\"=\" * 50)\n\n";
+          script += "###===Your Viewable Menu===###\n";
+          script += "def menu():\n";
+          script += "    clear_screen()\n";
+          if (title) {
+              script += "    print('" + title + "')\n";
+          }
+          if (uniqueMatches.join("")) { // Check if allMatches.join has a value
+              script += "    print('" + "Your script requires these variables to bet set" + " " + uniqueMatches.join(", ") + "')\n";
+          }        script += "    print_separator()\n";
         // Include the default option and command in the script
         script += "    print('" + "1. " + defaultOption + "')\n";
         // Loop through the dynamically added menu options and include them in the script
@@ -101,21 +256,33 @@
           var command = document.getElementById("command" + i).value;
           script += "    print('" + (i+1) + ". " + optionName + "')\n";
         }
-        if (uniqueMatches.join("")) { // Check if allMatches.join has a value
+        if (uniqueMatches.length > 0) { // Check if uniqueMatches has any values
           script += "    ";
           for (var j = 0; j < uniqueMatches.length; j++) {
             script += "print(f'set_" + uniqueMatches[j] + " | Variable currently set as {" + uniqueMatches[j] +"}')\n    ";
+            script += "print('(exit) Exit')\n\n";
           }
-        }
-        script += "print('(exit) Exit')\n\n";
-        script += "###===Making Clear Screen Work On Windows And Linux===###\n";
+        } else { // uniqueMatches is empty
+          script += "    print('(exit) Exit')\n\n";
+        }        script += "###===Making Clear Screen Work On Windows And Linux===###\n";
         script += "def clear_screen():\n";
         script += "    os.system('cls' if os.name == 'nt' else 'clear')\n\n";
         script += "###===When You Choose An Option It Runs One Of These===###\n";
         script += "def " + defaultOption_formatted + "():\n";
+        var command = defaultCommand;
+        var escapedCommand = "";
+        for (var i = 0; i < command.length; i++) {
+          var c = command.charAt(i);
+          if (c == "\"") {
+            escapedCommand += "\\\"";
+          } else if (c == "\\") {
+            escapedCommand += "\\\\";
+          } else {
+            escapedCommand += c;
+          }
+        }        
         script += "    print('You selected " + defaultOption + "')\n";
-        var replaceddInput = defaultCommand.replace(/\$([a-zA-Z0-9]+)/g, '{$1}');
-        script += "    " + defaultOption_formatted + " = f\"" + replaceddInput + "\"\n";
+        script += "    " + defaultOption_formatted + " = f\"" + escapedCommand + "\"\n";
         script += "    try:\n";
         script += "        os.system(" + defaultOption_formatted + ")\n";
         script += "    except KeyboardInterrupt:\n";
@@ -127,9 +294,21 @@
             var command = commandInput.value;
             var optionName_formatted = optionName.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "_");
             var replacedInput = commandInput.replace(/\$([a-zA-Z0-9]+)/g, '{$1}');
+            var command2 = replacedInput;
+            var escapedCommand2 = "";
+            for (var i = 0; i < command2.length; i++) {
+              var c = command2.charAt(i);
+              if (c == "\"") {
+                escapedCommand2 += "\\\"";
+              } else if (c == "\\") {
+                escapedCommand2 += "\\\\";
+              } else {
+                escapedCommand2 += c;
+              }
+            }        
             script += "def " + optionName_formatted + "():\n";
             script += "    print('You selected " + optionName + "')\n";
-            script += "    " + optionName_formatted + " = f\"" + replacedInput + "\"\n";
+            script += "    " + optionName_formatted + " = f\"" + escapedCommand2 + "\"\n";
             script += "    try:\n";
             script += "        os.system(" + optionName_formatted + ")\n";
             script += "    except KeyboardInterrupt:\n";
@@ -201,18 +380,15 @@
         for (var i = 1; i <= optionCount; i++) {
           document.getElementById("optionDiv" + i).remove();
         }
-      
-        // Reset the option count and options array
-        optionCount = 0;
-        options = [];
-      
         // Recreate the original menu option fields
         document.getElementById("menu-options").innerHTML = '<label for="option">Menu option:</label>' +
-                                                              '<input type="text" id="option" name="option">' +
-                                                              '<label for="command">Command:</label>' +
-                                                              '<input type="text" id="command" name="command">' +
-                                                              '<button onclick="addOption()">Add menu option</button><br><br>';
-      }    
+                                                             '<input type="text" id="option" name="option">' +
+                                                             '<label for="command">Command:</label>' +
+                                                             '<input type="text" id="command" name="command">';
+        optionCount = 0;
+        options = [];
+        document.getElementById("script").value = ""; // added line
+      }      
       </script>
   </body>
 </html>
