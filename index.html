@@ -67,7 +67,9 @@
             var optionName_formatted = optionName.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "_");
             var inputMatches = commandInput.match(regex) || [];
         }
-        var allMatches = defaultMatches.concat(inputMatches);        
+        var allMatches = defaultMatches.concat(inputMatches).map(function(match) {
+          return match.replace('$', '');
+        });
         var script = "#!/usr/bin/env python\n\n";
         script += "###===Import Modules Go Here===###\n";
         script += "import os\n\n";
@@ -124,6 +126,19 @@
             script += "        print('" + optionName + " interrupted by user')\n";
             script += "    input('Press enter to return to menu...')\n\n";
         }
+        if (allMatches.length > 0) {
+          allMatches.forEach((match, index) => {
+            script += `def set_${match}():
+            global ${match}
+            ${match} = input('Enter a new ${match}:')
+            input('Press enter to return to menu...')
+        `;
+            if (index !== allMatches.length - 1) {
+              script += '\n';
+            }
+          });
+        }
+        script += "\n";
         script += "def exit_menu():\n";
         script += "    print('Goodbye!')\n";
         script += "    exit()\n\n";
@@ -154,6 +169,15 @@
           script += "        if choice == '" + (i+1) + "':\n";
           script += "            " + optionNameFormatted + "()\n";
         }        
+        if (allMatches.length > 0) {
+          allMatches.forEach((match, index) => {
+            script += `        if choice == 'set_${match}':
+                    set_${match}()\n`;
+            if (index !== allMatches.length - 1) {
+              script += `        `;
+            }
+          });
+        }
         script += "        elif choice.lower() == 'exit':\n";
         script += "            exit_menu()\n";
         script += "        else:\n";
