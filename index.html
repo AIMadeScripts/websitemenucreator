@@ -8,9 +8,10 @@
         font-family: Arial, sans-serif;
         background-color: transparent;
         background-image: url('https://wallpaper.dog/large/5470615.gif');
-        background-size: cover;
+        background-size: 100% 100%;
         background-position: center;
         background-repeat: no-repeat;
+        margin: 0; /* Added to remove default margin */
       }      
       h1 {
         text-align: center;
@@ -35,6 +36,7 @@
       #menu-options {
         display: block;
         margin: 0 auto;
+        margin-bottom: 50px;
         max-width: 500px;
       }
 
@@ -71,11 +73,12 @@
         padding: 10px;
         text-align: center;
         font-size: 18px;
+        margin-top: 50px;
         border-radius: 10px;
         box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1);
         cursor: pointer;
         transition: all 0.3s ease;
-        margin-right: 10px;
+        margin-right: 20px;
       }
 
       button:hover {
@@ -91,37 +94,122 @@
         border: none;
         margin-right: 10px;
         width: 80%;
+        margin-top: 10px;
         box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1);
         background-color: #302c27;
       }
 
       textarea {
-      height: 700px;
-      font-family: 'Arial', sans-serif;
+        height: 600px;
+        width: 80%;
+        font-family: 'Arial', sans-serif;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: left;
+        justify-content: center;
+        margin-top: 50px;
       }
       
-     </style>
-  </head>
-  <body>
-    <h1>Menu Creator</h1>
-    <label for="title">Enter a title for your menu: </label><br>
-    <input type="text" id="title" name="title"><br><br>
-    <div id="menu-options">
-      <label for="option">Menu option:</label>
-      <input type="text" id="option" name="option">
-      <label for="command">Command:</label>
-      <input type="text" id="command" name="command">
-    </div><br>
+      textarea#script {
+        width: 70%;
+        margin-left: 10%;
+        /* remaining styles */
+      }      
+      
+      .button-container {
+        display: flex;
+        margin-top: 20px;
+      }
+.dropdown {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.dropbtn {
+  background-color: #000000;
+  color: white;
+  padding: 10px;
+  font-size: 18px;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #0000;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 10px 16px; /* modified padding */
+  text-decoration: none;
+  display: block;
+  width: 100%; /* added width */
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+    </style>  
+    </head>
+<body>
+
+  <div class="dropdown">
+    <button class="dropbtn">Options</button>
+    <div class="dropdown-content">
     <button onclick="addOption()">Add menu option</button>
     <button onclick="generateScript()">Generate Script</button>
     <button onclick="resetOptions()">Reset options</button>
-    <button onclick="copyScript()">Copy Script</button><br><br>
+    <button onclick="copyScript()">Copy Script</button>
+    </div>
+  </div>
+</div>
+    <h1>Menu Creator</h1>
+    <div class="form-group">
+      <label for="title">Enter a title for your menu:</label>
+      <input type="text" id="title" name="title">
+    </div>
+    <div id="menu-options" class="form-group">
+      <div class="menu-option">
+        <label for="option">Menu option:</label>
+        <input type="text" id="option" name="option">
+      </div>
+      <div class="command">
+        <label for="command">Command:</label>
+        <input type="text" id="command" name="command">
+      </div>
+    </div>
     <form id="menu-form">
-      <textarea id="script" class="textarea" rows="20" cols="80"></textarea>
+      <div class="form-group">
+        <label for="script">Script:</label>
+        <textarea id="script" class="textarea" rows="20" cols="80"></textarea>
+      </div>
     </form>
+  </div>
         <script>
       var optionCount = 0;
       var options = [];
+      // Get the dropdown button and content
+      var dropdownBtn = document.querySelector(".dropbtn");
+      var dropdownContent = document.querySelector(".dropdown-content");
+      
+      // Add a click event listener to the button
+      dropdownBtn.addEventListener("click", function() {
+        // Toggle the display of the dropdown content
+        dropdownContent.style.display === "block" ? 
+          dropdownContent.style.display = "none" : 
+          dropdownContent.style.display = "block";
+      });      
       
       function copyScript() {
         var copyText = document.getElementById("script");
@@ -180,11 +268,30 @@
       }
       
       function generateScript() {
-          var title = document.getElementById("title").value.trim();
-          if (!title) {
-              alert("Please enter a title for your menu.");
-              return;
+        var title = document.getElementById("title").value.trim();
+        if (!title) {
+          alert("Please enter a title for your menu.");
+          return;
+        }
+      
+        var menuOptions = document.querySelectorAll("#menu-options .menu-option input[type=text]");
+        for (var i = 0; i < menuOptions.length; i++) {
+          var menuOption = menuOptions[i].value.trim();
+          if (!menuOption) {
+            alert("Please enter a menu option for option " + (i + 1) + ".");
+            return;
           }
+        }
+      
+        var commands = document.querySelectorAll("#menu-options .command input[type=text]");
+        for (var j = 0; j < commands.length; j++) {
+          var command = commands[j].value.trim();
+          if (!command) {
+            alert("Please enter a command for menu option " + (j + 1) + ".");
+            return;
+          }
+        }          
+        
           // Retrieve the default option and command inputs
           var defaultOption = document.getElementById("option").value;
           var defaultCommand = document.getElementById("command").value;
@@ -372,6 +479,7 @@
                                                              '<label for="command">Command:</label>' +
                                                              '<input type="text" id="command" name="command">';
         optionCount = 0;
+        menuOptionNumber = 1;
         options = [];
         document.getElementById("script").value = ""; // added line
       }      
