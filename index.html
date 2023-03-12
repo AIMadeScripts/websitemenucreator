@@ -39,6 +39,10 @@
         margin: 0 auto;
         margin-bottom: 10px;
         max-width: 500px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex-wrap: wrap;
       }
 
       input[type=text],
@@ -62,7 +66,7 @@
       
       menu-options label, .new-option {
        border: 1px solid #4d2f5d;
-       padding: 10px;
+       padding: 35px;
        margin-bottom: 20px;
        border-radius: 10px;
        margin-top: 50px;
@@ -71,13 +75,6 @@
        content: none;
      }
 
-
-      #menu-options {
-        display: flex;
-        justify-content: center; /* Add this line */
-        flex-wrap: wrap;
-      }
-      
       #menu-options label {
         background-color: #4d2f5d;
         padding: 10px;
@@ -88,11 +85,10 @@
         font-size: 18px;
         border-radius: 10px;
         border: 1px solid #222;
-        width: 80%;
-        margin-top: 10px;
+        width: 50%;
+        margin-top: 15px;
         box-shadow: 0px 3px 5px rgb(0 0 0 / 10%);
         text-align: center;
-        
         display: block;
         margin: 0 auto;
       }
@@ -126,7 +122,8 @@
         box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1);
         cursor: pointer;
         transition: all 0.3s ease;
-        margin-right: 20px;
+        display: block;
+        z-index: 1;
       }
 
       button:hover {
@@ -140,8 +137,8 @@
         padding: 10px;
         font-size: 18px;
         border-radius: 10px;
-        border: 1px solid #222;
-        width: 80%;
+        border: 1px solid #4d2f5d;
+        width: 100%;
         margin-top: 10px;
         box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1);
         background-color: #2a2a2a;
@@ -154,73 +151,90 @@
       }
 
       .container {
-        display: flex;
+        display: fixed;
         flex-direction: column;
         align-items: left;
         justify-content: center;
         margin-top: 50px;
       }
       
+      .container {
+        position: relative; /* Set the position property to relative */
+      }
+      
+      .textarea-container {
+        position: relative;
+      }
+      
       textarea#script {
         width: 70%;
         margin-left: 10%;
         /* remaining styles */
-      }      
+      }
       
       .button-container {
-        display: flex;
-        margin-top: 20px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        transform: translate(-310px, -100%););
       }
-.dropdown {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-}
-
-.dropbtn {
-  background-color: #000000;
-  color: white;
-  padding: 10px;
-  font-size: 18px;
-  border: none;
-  border-radius: 10px;
-  box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #0000;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
-}
-
-.dropdown-content a {
-  color: black;
-  padding: 10px 16px; /* modified padding */
-  text-decoration: none;
-  display: block;
-  width: 100%; /* added width */
-}
-
-.dropdown-content a:hover {
-  background-color: #4d2f5d;
-}
-    /* center the image */
-    img {
-      display: block;
-      margin: 0 auto;
+      
+      #my-button {
+        background-color: #4d2f5d;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        /* remaining styles */
+      }
+      .dropbtn {
+        color: white;
+        font-size: 18px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        position: fixed; /* add this line */
+      }
+      
+      .dropdown-content {
+        display: none;
+        position: fixed;
+        min-width: 160px;
+        z-index: 1;
+      }
+      
+      .dropdown-content a {
+        color: black;
+        padding: 10px;
+        text-decoration: none;
+        display: block;
+        width: 100%;
+      }
+      
+      .dropdown-content a:hover {
+        background-color: #4d2f5d;
+      }          
+      /* center the image */
+          img {
+            display: block;
+            margin: 0 auto;
+          }
+    .menu-options-container {
+      border: 1px solid #4d2f5d;
+      padding: 10px;
+      margin-bottom: 10px;
+      max-width: 600px; /* add this line to set the maximum width */
+      margin-left: auto; /* add this line to center the container horizontally */
+      margin-right: auto; /* add this line to center the container horizontally */
     }
-
     </style>  
     </head>
 <body>
   <img src="https://i.imgur.com/TBHSQOg.png" alt="Menu Creator">
   <div class="dropdown">
     <button class="dropbtn">Options</button>
-    <div class="dropdown-content">
+    <div class="dropdown-content" style="display: none;">
     <button onclick="addOption()">Add menu option</button>
     <button onclick="generateScript()">Generate Script</button>
     <button onclick="resetOptions()">Reset options</button>
@@ -231,24 +245,26 @@
     <h1>Menu Creator</h1>
     <div class="form-group">
       <label for="title">Enter a title for your menu:</label>
-      <input type="text" id="title" name="title" placeholder="My Awesome v1000!!!!">
+      <input type="text" id="title" name="title" placeholder="My Awesome Menu v1000!!!!">
     </div>
-    <div id="menu-options" class="form-group">
-      <div class="menu-option">
-        <label for="option">Menu option:</label>
-        <input type="text" id="option" name="option" placeholder="Example: Ping a Website">
+      <div class="menu-options-container">
+        <div id="menu-options" class="form-group">
+          <div class="menu-option">
+            <label for="option">Default menu option:</label>
+            <input type="text" id="option" name="option" placeholder="Example: Ping a Website">
+          </div>
+          <div class="command">
+            <label for="command">Default command:</label>
+            <input type="text" id="command" name="command" placeholder="Command like ping google.com">
+          </div>
+        </div>
+      </div>    </div>
+      <div class="textarea-container">
+        <textarea id="script"></textarea>
+        <div class="button-container">
+          <button id="my-button" onclick="copyScript()">Copy Script</button>
+        </div>
       </div>
-      <div class="command">
-        <label for="command">Command:</label>
-        <input type="text" id="command" name="command" placeholder="Command like ping google.com">
-      </div>
-    </div>
-    <form id="menu-form">
-      <div class="form-group">
-        <label for="script">Script:</label>
-        <textarea id="script" class="textarea" rows="20" cols="80"></textarea>
-      </div>
-    </form>
   </div>
         <script>
       var optionCount = 0;
@@ -259,12 +275,15 @@
       
       // Add a click event listener to the button
       dropdownBtn.addEventListener("click", function() {
-        // Toggle the display of the dropdown content
-        dropdownContent.style.display === "block" ? 
-          dropdownContent.style.display = "none" : 
+        // Check the current display style of the dropdown content
+        if (dropdownContent.style.display === "none") {
+          // If the dropdown content is hidden, show it
           dropdownContent.style.display = "block";
+        } else {
+          // If the dropdown content is visible, hide it
+          dropdownContent.style.display = "none";
+        }
       });      
-      
       function copyScript() {
         var copyText = document.getElementById("script");
         copyText.select();
@@ -292,7 +311,7 @@
           optionCount +
           '" name="option' +
           optionCount +
-          '">' +
+          '" placeholder="Enter another menu name...">' +
           '<label for="command' +
           optionCount +
           '">Command ' +
@@ -302,7 +321,7 @@
           optionCount +
           '" name="command' +
           optionCount +
-          '">' +
+          '" placeholder="Enter another command...">' +
           '<button id="deleteOption' +
           optionCount +
           '" onclick="deleteOption(' +
@@ -533,19 +552,19 @@
 
       function resetOptions() {
         // Remove all dynamically added menu option fields
-        for (var i = 1; i <= optionCount; i++) {
-          document.getElementById("optionDiv" + i).remove();
+        var optionContainers = document.querySelectorAll('.option-container.new-option');
+        for (var i = 0; i < optionContainers.length; i++) {
+          optionContainers[i].parentNode.removeChild(optionContainers[i]);
         }
       
-        // Recreate the original menu option fields
-
+        // Reset global variables
         optionCount = 0;
-        menuOptionNumber = 1;
+        menuOptionNumber = 0;
         options = [];
-        
+      
         // Set textarea to blank
         document.getElementById("script").value = "";
-      }      
+      }
       </script>
   </body>
 </html>
