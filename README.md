@@ -23,7 +23,7 @@ def set_websitevariable():
 ```
 6. Finally - the last problem/thing - The first menu option variable doesn't get updated to {website} from $website in this output:
 But menu options 2+ do
-```
+
 ```
 def ping():
     print('You selected ping')
